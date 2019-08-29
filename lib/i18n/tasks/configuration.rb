@@ -38,7 +38,31 @@ module I18n::Tasks::Configuration # rubocop:disable Metrics/ModuleLength
 
   def config=(conf)
     @config = file_config.deep_merge(conf)
+    extend_paths
     @config_sections = {}
+  end
+
+  def extend_paths
+    search_paths = @config['search']['paths']
+    star_paths = search_paths.select { |path| path.include?('*') }
+    star_paths.each do |path|
+      search_paths.delete(path)
+      search_paths.concat Dir[path]
+    end
+    engines_path = @config['data'].delete('engines_path_for_write')
+    if engines_path
+      engines = Dir[engines_path].map{ |path| path.split('/').last }
+      engines_write_paths = ["{#{engines.join(',')}}.*",
+                              "#{engines_path.split('/').first}/\\1/config/locales/%{locale}.yml"]
+      @config['data']['write'].unshift(engines_write_paths)
+    end
+
+    relative_roots = @config['search']['relative_roots']
+    star_roots = relative_roots.select { |path| path.include?('*') }
+    star_roots.each do |path|
+      relative_roots.delete(path)
+      relative_roots.concat Dir[path]
+    end
   end
 
   # data config

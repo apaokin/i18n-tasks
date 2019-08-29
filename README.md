@@ -1,5 +1,37 @@
 # i18n-tasks [![Build Status][badge-travis]][travis] [![Coverage Status][badge-coverage]][coverage] [![Gemnasium][badge-gemnasium]][gemnasium] [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/glebm/i18n-tasks?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+## Differences between this fork and base repo
+This fork is designed to enable translation management for Ruby On Rails engines. Only [this configuration file](lib/i18n/tasks/configuration.rb) is different from the base repo(a new #extend_paths method is called after config is initialized)
+### New possibilities
+1. Specify paths and relative roots for your engines using Dir search pattern:
+
+        search:
+          paths:
+           - app/ # Path for base application
+           - engines/*  # Path for engines
+          relative_roots:
+           - app/controllers
+           - engines/*/app/controllers/
+           - app/helpers
+           - engines/*/app/helpers/
+           - app/mailers
+           - engines/*/app/mailers/
+           - app/presenters
+           - engines/*/app/presenters/
+           - app/views
+           - engines/*/app/views/
+           - engines/*/app/notificators/
+
+2. Use engines_path_for_write (inside data section) to add-missing keys to appropriate locale files.
+          engines_path_for_write: engines/* # Generates write rule
+          # - ['{engines_from_engines_dir_seperated_with_comma}.*',
+          # 'engines/\1/config/locales/%{locale}.yml']
+          write:
+            # Don't forget to specify catch-all default!!:
+            - config/locales/%{locale}.yml
+
+
+## Base repo Description
 i18n-tasks helps you find and manage missing and unused translations.
 
 <img width="539" height="331" src="https://i.imgur.com/XZBd8l7.png">
